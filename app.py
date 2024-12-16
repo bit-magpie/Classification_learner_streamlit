@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from io import StringIO
+import seaborn as sns
+import plotly.express as px
 
 st.set_page_config(page_icon="🎓", page_title="Leaner App")
 
@@ -8,6 +9,10 @@ st.set_page_config(page_icon="🎓", page_title="Leaner App")
 def get_upload(uploaded_file):    
     dataframe = pd.read_csv(uploaded_file)
     st.write(dataframe)
+    
+    d = sns.load_dataset("penguins")
+    plot = sns.pairplot(d, hue="species")
+    st.pyplot(plot.figure)
 
 def main():    
     st.header("Machine Learning UI")
@@ -21,6 +26,19 @@ def main():
             ''')
         uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])
         if uploaded_file is not None:
-            get_upload(uploaded_file)
+            get_upload(uploaded_file)            
+
+
+        df = px.data.iris()
+        fig = px.scatter(
+            df,
+            x="sepal_width",
+            y="sepal_length",
+            color="species",
+            # size="petal_length",
+            # hover_data=["petal_width"],
+        )
+
+        event = st.plotly_chart(fig, key="iris", on_select="rerun")
 
 main()

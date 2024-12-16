@@ -23,7 +23,4 @@ def main():
         if uploaded_file is not None:
             get_upload(uploaded_file)
 
-    col1, col2 = st.columns(2)
-
-
 main()

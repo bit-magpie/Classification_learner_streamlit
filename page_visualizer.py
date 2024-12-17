@@ -32,10 +32,15 @@ def visualize_categories():
         event = st.plotly_chart(fig, key="plot_scatter", on_select="rerun")
 
 def visualize_boxplots():
-    pass
+    with st.expander("Boxplots"):        
+        feat = st.selectbox("Select feature", data_functions.data_file.features)
+        fig = px.box(data_functions.data_file.df, 
+                     x=data_functions.data_file.target, 
+                     y=feat)
+        event = st.plotly_chart(fig, key="plot_box", on_select="rerun")
 
 def visualize_pairplot():
-    with st.expander("Scatter plot"):
+    with st.expander("Pairplot"):
         # plot = sns.pairplot(data_functions.data_file.df, hue=data_functions.data_file.target)
         # st.pyplot(plot.figure)
         fig = px.scatter_matrix(data_functions.data_file.df,
@@ -50,6 +55,7 @@ def main():
         with st.expander("Show data file"):
             data_functions.data_file.df
         visualize_categories()
+        visualize_boxplots()
         visualize_pairplot()
     else:
         st.text("No dataset found. Please upload a CSV formatted data file.")

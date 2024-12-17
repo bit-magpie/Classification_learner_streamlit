@@ -7,7 +7,7 @@ import time
 st.set_page_config(
     page_icon="🎓", 
     page_title="Leaner App",
-    
+    # layout="wide"
     )
 def main():  
     start_page = st.Page("page_start.py", title="Start")

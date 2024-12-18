@@ -10,7 +10,7 @@ st.set_page_config(
     # layout="wide"
     )
 def main():  
-    start_page = st.Page("page_start.py", title="Start")
+    start_page = st.Page("page_start.py", title="Data selection")
     visualizer = st.Page("page_visualizer.py", title="Visualize data")
     models = st.Page("page_models.py", title="Model training")
     results = st.Page("page_results.py", title="Evaluvation summary")

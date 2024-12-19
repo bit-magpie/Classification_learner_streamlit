@@ -1,6 +1,8 @@
 import numpy as np
 import sklearn
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, auc, roc_curve
+
+trained_models = dict()
 
 classification_algorithms = {
     "LR": {
@@ -41,16 +43,6 @@ classification_algorithms = {
             "learning_rate": 0.1,
             "max_depth": 3,
             "subsample": 1.0
-        }
-    },
-    "XGBC": {
-        "long_name": "XGBoost Classifier",
-        "function": "xgboost.XGBClassifier",
-        "parameters": {
-            "n_estimators": 100,
-            "learning_rate": 0.3,
-            "max_depth": 6,
-            "gamma": 0
         }
     },
     "KNN": {
@@ -127,7 +119,7 @@ classification_algorithms = {
         }
     },
     "KMC": {
-        "long_name": "K-Means Clustering (used for classification via clustering)",
+        "long_name": "K-Means",
         "function": sklearn.cluster.KMeans,
         "parameters": {
             "n_clusters": 8,
@@ -137,7 +129,7 @@ classification_algorithms = {
         }
     },
     "GMM": {
-        "long_name": "Gaussian Mixture Model (used for classification via clustering)",
+        "long_name": "Gaussian Mixture Model",
         "function": sklearn.mixture.GaussianMixture,
         "parameters": {
             "n_components": 1,
@@ -145,29 +137,66 @@ classification_algorithms = {
             "init_params": "kmeans",
             "max_iter": 100
         }
-    }
+    },
+    "XGBC": {
+        "long_name": "XGBoost Classifier",
+        "function": "xgboost.XGBClassifier",
+        "parameters": {
+            "n_estimators": 100,
+            "learning_rate": 0.3,
+            "max_depth": 6,
+            "gamma": 0
+        }
+    },
 }
-
-def get_metrics(model, x_test, y_tests):
-    y_preds = model.predict(x_test)
-    return accuracy_score(y_tests, y_preds)
-    
-    
+   
 
 class Learner:
-    def __init__(self):
-        self.name = ""
-        self.params = []
+    def __init__(self, name, model, params=None):
+        self.name = name
+        self.model = None
+        self.params = params
+        self.train_data = None
+        self.test_data = None
+        self.accuracy = None
+        self.f1 = None
+        self.c_matrix = None
+        self.auc = None
+        
+        self._load_model(model)
     
-    def load_data(self):
-        pass
+    def load_data(self, X, y, shuffle=True, train_split=0.8):
+        if shuffle:
+            X, y = self._shuffle_set(X, y)
+        
+        n_train = int(len(y) * train_split)
+        self.train_data = [X[:n_train], y[:n_train]]
+        self.test_data = [X[n_train:], y[n_train:]]        
     
-    def train_model(self):
-        pass
+    def train_model(self):        
+        X, y = self.train_data
+        self.model.fit(X, y)
     
     def eval_model(self):
-        pass
+        if self.model is not None:
+            X, y = self.test_data
+            y_preds = self.model.predict(X)
+            
+            self.accuracy = accuracy_score(y, y_preds)            
+            self.f1 = f1_score(y, y_preds, average='weighted')
+            self.c_matrix = confusion_matrix(y, y_preds)            
+            fpr, tpr, _ = roc_curve(y, y_preds, pos_label=2)
+            self.auc = auc(fpr, tpr)
+        
+    def _shuffle_set(self, X, y):
+        idx = np.arange(len(y))
+        np.random.shuffle(idx)        
+        return X[idx], y[idx]
+        
+    def _load_model(self, model):
+        self.model = model(**self.params)
     
     def __repr__(self):
-        pass
+        cls = self.__class__.__name__
+        return f'{cls}(model={self.name!r})'
         

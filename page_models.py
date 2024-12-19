@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import data_functions
 import learner_module
-import numpy as np
+from learner_module import Learner
+
 
 acc_placeholders = dict()
 
@@ -16,7 +18,7 @@ def model_element(id, name, params):
     with st.container(border=True):
         col1, col2, col3 = st.columns([1, 9, 2])
         with col1:
-            chkbox = st.checkbox("|", key=id, value=False)
+            chkbox = st.checkbox("|", key=id, value=True)
         with col2:            
             st.write("##### " + name)
             list_params(params)
@@ -55,19 +57,24 @@ def tablulate_models():
         # )
         
 def train_model():
-    X = np.array([[0, 0], [1, 1], [1, 0], [0, 1]])
-    y = np.array([0, 0, 1, 1])
+    X, y = data_functions.data_file.get_train_data()
     
     model_list = learner_module.classification_algorithms
     for k in model_list.keys():
         if st.session_state[k]:
             with acc_placeholders[k].container(): 
                 with st.spinner("Training..."):
-                    model = model_list[k]["function"]()
-                    model.fit(X,y) 
-                    accuracy = learner_module.get_metrics(model, X, y)
+                    model = Learner(k, model_list[k]["function"], model_list[k]["parameters"])
+                    model.load_data(X, y)
+                    model.train_model()
+                    model.eval_model()                    
+                    
+                    # model = model_list[k]["function"]()
+                    # model.fit(X,y) 
+                    # accuracy = learner_module.get_metrics(model, X, y)
             
-                st.write(f"#### {accuracy*100}%")
+                st.write(f"#### {model.accuracy*100:.1f}%")
+                learner_module.trained_models[k] = model
 
 def main():    
     st.header("Model training")    

@@ -21,35 +21,10 @@ class DataFile:
     def set_features(self):
         if len(self.selection) > 0:
             self.features = list(compress(self.df.columns, self.selection))
-    
-
-class Dataset:
-    def __init__(self, X, y):
-        self.X = X
-        self.y = y
-        self.x_train = X
-        self.y_train = y
-        self.x_test = X
-        self.y_test = y        
-    
-    def split(self, percentage):
-        idx = np.arange(len(self.X))
-        np.random.shuffle(idx)
-        
-        sX = self.X[idx]
-        sy = self.y[idx]
-        
-        n_train = int(len(self.X) * percentage)
-        self.x_train = sX[:n_train]
-        self.y_train = sy[:n_train]
-        self.x_test = sX[n_train:]
-        self.y_test = sy[n_train:]
-    
-    def __len__(self):
-        return len(self.y)
-    
-    def __repr__(self):
-        cls = self.__class__.__name__
-        n = len(self.y)
-        num_features = self.X.shape[1]
-        return f'{cls}(samples={n}, features={num_features})'
+            
+    def get_train_data(self):
+        if self.target is not None and self.features is not None:
+            self.df[['classes']] = self.df[[self.target]].apply(lambda col:pd.Categorical(col).codes)
+            X = self.df[self.features].to_numpy()
+            y = self.df[['classes']].to_numpy().ravel()
+            return X, y

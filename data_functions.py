@@ -12,6 +12,7 @@ class DataFile:
         self.features = None
         self.selection = []
         self.target = None
+        self.c_names = None
         self._get_info(upload_file)
     
     def _get_info(self, upload_file):
@@ -25,6 +26,7 @@ class DataFile:
     def get_train_data(self):
         if self.target is not None and self.features is not None:
             self.df[['classes']] = self.df[[self.target]].apply(lambda col:pd.Categorical(col).codes)
+            self.c_names = list(self.df[self.target].unique())
             X = self.df[self.features].to_numpy()
             y = self.df[['classes']].to_numpy().ravel()
             return X, y

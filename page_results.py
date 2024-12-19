@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import learner_module
+import data_functions
 
 def get_eval_metrics():
     results = dict()
@@ -25,9 +26,14 @@ def get_eval_metrics():
 @st.dialog("More details")
 def show_details(id, name):
     model = learner_module.trained_models[id]
+    c_names = data_functions.data_file.c_names
     st.write(f"#### {name}")
-    st.write(f"Test samples: {len(model.test_data[1])}")
-    fig = px.imshow(model.c_matrix, text_auto=True)
+    with st.container(border=True):        
+        st.write(f"Test samples: `{len(model.test_data[1])}`")
+        st.write(f"Number of classes: `{len(c_names)}`")
+        st.write(f"Test Accuracy: `{model.accuracy*100:.1f}%`")
+        
+    fig = px.imshow(model.c_matrix, text_auto=True, x=c_names, y=c_names)
     event = st.plotly_chart(fig, key="plot_cmat", on_select="rerun")
     
 
@@ -35,13 +41,18 @@ def main():
     st.header("Evaluation summary")
     if len(learner_module.trained_models) > 0:
         with st.container(border=True):
-            df = get_eval_metrics()
+            df = get_eval_metrics() 
+            cols = ['Accuracy','F1 Score', 'AUC']
+            df[cols] = df[cols].applymap(lambda x: '{0:.4f}'.format(x))           
+            # df.style.format({"Accuracy": "{:.4f}", "F1 Score": "{:,.4f}", "AUC": "{:,.4f}"})
+            # df = df.astype(str)
             
             event = st.dataframe(
                 df[["Model", "Accuracy", "F1 Score", "AUC"]],
                 on_select='rerun',
                 selection_mode='single-row',
-                use_container_width=True
+                use_container_width=True,
+                hide_index=True
             )
 
             if len(event.selection['rows']):

@@ -1,5 +1,6 @@
 import numpy as np
 import sklearn
+from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, auc, roc_curve
 
 trained_models = dict()
@@ -140,7 +141,7 @@ classification_algorithms = {
     },
     "XGBC": {
         "long_name": "XGBoost Classifier",
-        "function": "xgboost.XGBClassifier",
+        "function": XGBClassifier,
         "parameters": {
             "n_estimators": 100,
             "learning_rate": 0.3,
@@ -171,7 +172,11 @@ class Learner:
         
         n_train = int(len(y) * train_split)
         self.train_data = [X[:n_train], y[:n_train]]
-        self.test_data = [X[n_train:], y[n_train:]]        
+        self.test_data = [X[n_train:], y[n_train:]]
+        
+    def set_train_test(self, train, test):
+        self.train_data = train
+        self.test_data = test
     
     def train_model(self):        
         X, y = self.train_data

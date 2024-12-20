@@ -30,3 +30,19 @@ class DataFile:
             X = self.df[self.features].to_numpy()
             y = self.df[['classes']].to_numpy().ravel()
             return X, y
+        
+    def get_process_data(self, shuffle=True, train_split=0.8):
+        X, y = self.get_train_data()
+        if shuffle:
+            X, y = self._shuffle_set(X, y)
+        
+        n_train = int(len(y) * train_split)
+        train_data = [X[:n_train], y[:n_train]]
+        test_data = [X[n_train:], y[n_train:]]
+        
+        return train_data, test_data
+        
+    def _shuffle_set(self, X, y):
+        idx = np.arange(len(y))
+        np.random.shuffle(idx)        
+        return X[idx], y[idx]

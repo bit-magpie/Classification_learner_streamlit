@@ -57,7 +57,7 @@ def tablulate_models():
         # )
         
 def train_model():
-    X, y = data_functions.data_file.get_train_data()
+    train, test = data_functions.data_file.get_process_data()
     
     model_list = learner_module.classification_algorithms
     for k in model_list.keys():
@@ -65,7 +65,7 @@ def train_model():
             with acc_placeholders[k].container(): 
                 with st.spinner("Training..."):
                     model = Learner(k, model_list[k]["function"], model_list[k]["parameters"])
-                    model.load_data(X, y)
+                    model.set_train_test(train, test)
                     model.train_model()
                     model.eval_model()                    
                     

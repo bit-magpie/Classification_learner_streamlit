@@ -29,11 +29,11 @@ def show_details(id, name):
     c_names = data_functions.data_file.c_names
     st.write(f"#### {name}")
     with st.container(border=True):        
-        st.write(f"Test samples: `{len(model.test_data[1])}`")
-        st.write(f"Number of classes: `{len(c_names)}`")
-        st.write(f"Test Accuracy: `{model.accuracy*100:.1f}%`")
+        st.write(f"Test samples: `{len(model.test_data[1])}` Classes: `{len(c_names)}` Accuracy: `{model.accuracy*100:.1f}%`")
         
-    fig = px.imshow(model.c_matrix, text_auto=True, x=c_names, y=c_names)
+    fig = px.imshow(model.c_matrix, text_auto=True, x=c_names, y=c_names, labels=dict(x="Predicted classes", y="True classes"))
+    
+    fig.update_coloraxes(showscale=False)
     event = st.plotly_chart(fig, key="plot_cmat", on_select="rerun")
     
 

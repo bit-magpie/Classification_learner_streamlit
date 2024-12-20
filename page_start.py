@@ -29,7 +29,7 @@ def select_data():
         
 def main():
     st.header("Machine Learning UI")    
-    with st.container(border=True):
+    with st.container():
         st.markdown("### Start by uploading your dataset.")
         
         uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])

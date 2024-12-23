@@ -6,7 +6,7 @@ import time
 
 st.set_page_config(
     page_icon="🎓", 
-    page_title="Leaner App",
+    page_title="Classic Learner",
     layout="wide"
     )
 def main():  

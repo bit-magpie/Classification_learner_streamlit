@@ -37,10 +37,18 @@ def show_details(id, name):
     event = st.plotly_chart(fig, key="plot_cmat", on_select="rerun")
     
 
+def plot_bar(df, plot):
+    fig = px.bar(df, 
+                    x="id", 
+                    y=plot)
+    event = st.plotly_chart(fig, key="plot_bar_" + plot , on_select="rerun")
+
 def main():    
     st.header("Evaluation summary")
     if len(learner_module.trained_models) > 0:
-        with st.container(border=True):
+        tab1, tab2, tab3, tab4 = st.tabs(["All results", "Accuary", "F1-Score", "AUC"])
+
+        with tab1:
             df = get_eval_metrics() 
             cols = ['Accuracy','F1 Score', 'AUC']
             df[cols] = df[cols].map(lambda x: '{0:.4f}'.format(x))           
@@ -62,6 +70,13 @@ def main():
 
                 if st.button("Show details", key="btnDetails"):
                     show_details(model_id, model_name)
+        with tab2:
+            plot_bar(df, "Accuracy")
+        with tab3:
+            plot_bar(df, "F1 Score")
+        with tab4:
+            plot_bar(df, "AUC")
+
     else:
         st.text("No trained models found. Please trained the models first.")
         if st.button("Go to training page"):

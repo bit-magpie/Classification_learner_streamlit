@@ -64,7 +64,7 @@ def main():
             with tab3:
                 visualize_pairplot()
             with tab4:
-                data_functions.data_file.df
+                st.dataframe(data_functions.data_file.df, use_container_width=True)
         with col2: 
             show_meta_data()
     else:

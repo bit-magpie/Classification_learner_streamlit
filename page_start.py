@@ -32,12 +32,16 @@ def main():
     _, col1, _ = st.columns([2,8,2])    
     with col1:
         with st.container():
-            st.markdown("### Start by uploading your dataset.")
+            st.markdown("#### Start by uploading your dataset.")
             
             uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])
             if uploaded_file is not None:
                 set_data.clear()
                 set_data(uploaded_file)
-                select_data()            
+                select_data()  
+
+            # st.markdown("#### Or try loading sample dataset.")
+            with st.expander("#### Or try loading sample dataset."):
+                st.button("Iris dataset")     
         
 main()

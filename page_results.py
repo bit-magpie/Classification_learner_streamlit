@@ -60,16 +60,18 @@ def main():
                 on_select='rerun',
                 selection_mode='single-row',
                 use_container_width=True,
-                hide_index=True
+                hide_index=True,
+                height=600
             )
 
             if len(event.selection['rows']):
                 selected_row = event.selection['rows'][0]
                 model_id = df.iloc[selected_row]['id']
                 model_name = df.iloc[selected_row]['Model']
+                show_details(model_id, model_name)
 
-                if st.button("Show details", key="btnDetails"):
-                    show_details(model_id, model_name)
+                # if st.button("Show details", key="btnDetails"):
+                    
         with tab2:
             plot_bar(df, "Accuracy")
         with tab3:

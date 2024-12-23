@@ -37,24 +37,6 @@ def tablulate_models():
     
     for k,v in model_list.items():
         model_element(k, v["long_name"], v["parameters"])
-            
-        
-        # df = pd.DataFrame.from_dict(learner_module.classification_algorithms)
-        # df = df.T
-        # df["selected"] = [True] * len(df)
-        # st.data_editor(
-        #     df[["long_name", "selected"]],
-        #     column_config={
-        #         "model": st.column_config.CheckboxColumn(
-        #             "Select to train",
-        #             help="Select models to train",
-        #             default=True,
-        #         )
-        #     },
-        #     disabled=["widgets"],
-        #     hide_index=True,
-        #     width=800
-        # )
         
 def train_model():
     train, test = data_functions.data_file.get_process_data()
@@ -71,27 +53,29 @@ def train_model():
                     
                     # model = model_list[k]["function"]()
                     # model.fit(X,y) 
-                    # accuracy = learner_module.get_metrics(model, X, y)
+                    # accuracy = learner_module.get_metrics(model, X, y) 
             
                 st.write(f"#### {model.accuracy*100:.1f}%")
                 learner_module.trained_models[k] = model
 
-def main():    
-    st.header("Model training")    
-    if data_functions.data_file is not None:
-        with st.container(border=True): 
-            col1, col2 = st.columns([10,2])
-            with col1:
-                st.write("Selects models to train")
-            with col2:
-                btnTrain = st.button("Train all", key="btnTrain", type="primary")
-            
-            tablulate_models()
-            if btnTrain:
-                train_model()
-    else:
-        st.text("No dataset found. Please upload a CSV formatted data file.")
-        if st.button("Go to upload page"):
-            st.switch_page("page_start.py")
+def main():
+    _, col, _ = st.columns([2,8,2])
+    with col:    
+        st.header("Model training")    
+        if data_functions.data_file is not None:
+            with st.container(border=True): 
+                col1, col2 = st.columns([10,2])
+                with col1:
+                    st.write("Selects models to train")
+                with col2:
+                    btnTrain = st.button("Train all", key="btnTrain", type="primary")
+                
+                tablulate_models()
+                if btnTrain:
+                    train_model()
+        else:
+            st.text("No dataset found. Please upload a CSV formatted data file.")
+            if st.button("Go to upload page"):
+                st.switch_page("page_start.py")
 
 main()

@@ -43,7 +43,7 @@ def main():
         with st.container(border=True):
             df = get_eval_metrics() 
             cols = ['Accuracy','F1 Score', 'AUC']
-            df[cols] = df[cols].applymap(lambda x: '{0:.4f}'.format(x))           
+            df[cols] = df[cols].map(lambda x: '{0:.4f}'.format(x))           
             # df.style.format({"Accuracy": "{:.4f}", "F1 Score": "{:,.4f}", "AUC": "{:,.4f}"})
             # df = df.astype(str)
             

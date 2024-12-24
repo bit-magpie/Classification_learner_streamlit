@@ -163,6 +163,7 @@ class Learner:
         self.f1 = None
         self.c_matrix = None
         self.auc = None
+        self.num_cls = 2
         
         self._load_model(model)
     
@@ -190,7 +191,7 @@ class Learner:
             self.accuracy = accuracy_score(y, y_preds)            
             self.f1 = f1_score(y, y_preds, average='weighted')
             self.c_matrix = confusion_matrix(y, y_preds)            
-            fpr, tpr, _ = roc_curve(y, y_preds, pos_label=2)
+            fpr, tpr, _ = roc_curve(y, y_preds, pos_label=self.num_cls)
             self.auc = auc(fpr, tpr)
         
     def _shuffle_set(self, X, y):

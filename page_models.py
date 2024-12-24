@@ -47,6 +47,7 @@ def train_model():
             with acc_placeholders[k].container(): 
                 with st.spinner("Training..."):
                     model = Learner(k, model_list[k]["function"], model_list[k]["parameters"])
+                    model.num_cls = len(data_functions.data_file.c_names)
                     model.set_train_test(train, test)
                     model.train_model()
                     model.eval_model()                    

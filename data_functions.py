@@ -1,19 +1,28 @@
 import pandas as pd
 import numpy as np
 from itertools import compress
+import sklearn.datasets as skds
 
 data_file = None
 dataset = None
 
+sk_datasets = {"Iris": skds.load_iris, "Wine": skds.load_wine, "Digits": skds.load_digits, "Cancer": skds.load_breast_cancer}
+
 class DataFile:
-    def __init__(self, upload_file):
+    def __init__(self, upload_file=None, df=None, name=None):
         self.df = None
-        self.name = None
+        self.name = "Unknown"
         self.features = None
         self.selection = []
         self.target = None
         self.c_names = None
-        self._get_info(upload_file)
+        if upload_file is not None:
+            self._get_info(upload_file)
+            
+        if df is not None:
+            self.name = name
+            self.df = df
+            
     
     def _get_info(self, upload_file):
         self.df = pd.read_csv(upload_file)

@@ -20,9 +20,12 @@ def get_dataset_df(dataset_loader):
     return df, dataset['feature_names']
 
 def load_file_data(uploaded_file):
-    df = pd.read_csv(uploaded_file)
-    dataset = DataFile(df=df, name=uploaded_file.name )
-    st.session_state["Dataset"] = dataset
+    if "Dataset" not in st.session_state:
+        df = pd.read_csv(uploaded_file)
+        dataset = DataFile(df=df, name=uploaded_file.name)
+        dataset.target = df.columns[0]
+        dataset.features = df.columns[1:]
+        st.session_state["Dataset"] = dataset
 
 def load_sk_dataset(df, key, feature_cols):
     dataset = DataFile(df=df, name=key)
@@ -38,18 +41,21 @@ def show_exaplaination():
     st.write("- Ensure the file size is less than 200MB.")
     st.image("class_learn_exp.png")
 
+def set_target():
+    st.session_state["Dataset"].target = st.session_state["target"]
+
 def feature_selection():
     st.write("##### Select features(X) and target(y)")
     if "Dataset" in st.session_state:
         dataset = st.session_state["Dataset"]
         headers =  dataset.df.columns
         
-        target = st.selectbox("Target (y)", headers, key="target")
-        st.session_state["Dataset"].target = target
+        target = st.selectbox("Target (y)", headers, key="target", on_change=set_target)
         
         st.text("Features (X)")
         with st.container(height=300):
             col1, col2 = st.columns(2)
+            st.session_state["Dataset"].selection = []
             for i, feature in enumerate(headers):
                 if feature != target:
                     if i%2 == 0:
@@ -104,6 +110,7 @@ def main():
             if btnNext:
                 st.session_state["Dataset"].set_features()
                 st.session_state["Dataset_loaded"] = True
+                st.write(st.session_state["Dataset"].target)
                 st.switch_page("page_visualizer.py")
                         
     with col2:

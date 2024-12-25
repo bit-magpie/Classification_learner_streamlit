@@ -38,10 +38,11 @@ class DataFile:
         self.name = upload_file.name   
         
     def set_features(self):
-        print(self.target)
         self.c_names = self.df[self.target].unique()
+        col_names = list(self.df.columns)
+        col_names.remove(self.target)
         if len(self.selection) > 0:
-            self.features = list(compress(self.df.columns, self.selection))
+            self.features = list(compress(col_names, self.selection))
             
     def get_train_data(self):
         if self.target is not None and self.features is not None:

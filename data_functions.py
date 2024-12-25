@@ -1,14 +1,21 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from itertools import compress
 import sklearn.datasets as skds
 
-data_file = None
 dataset = None
 
-sk_datasets = {"Iris": skds.load_iris, "Wine": skds.load_wine, "Digits": skds.load_digits, "Cancer": skds.load_breast_cancer}
+if "Dataset" in st.session_state:
+    data_file = st.session_state["Dataset"]
+
+sk_datasets = {"Iris": skds.load_iris, 
+               "Wine": skds.load_wine, 
+               "Digits": skds.load_digits, 
+               "Cancer": skds.load_breast_cancer
+            }
 
 class DataFile:
     def __init__(self, upload_file=None, df=None, name=None):
@@ -31,7 +38,8 @@ class DataFile:
         self.name = upload_file.name   
         
     def set_features(self):
-        self.c_names = list(self.df[self.target].unique())
+        print(self.target)
+        self.c_names = self.df[self.target].unique()
         if len(self.selection) > 0:
             self.features = list(compress(self.df.columns, self.selection))
             
@@ -60,17 +68,19 @@ class DataFile:
         return X[idx], y[idx]
     
 def get_tsne():
-    X = data_file.df[data_file.features]
-    y = data_file.df[data_file.target]
+    if "Dataset" in st.session_state:
+        data_file = st.session_state["Dataset"]
+        X = data_file.df[data_file.features]
+        y = data_file.df[data_file.target]
 
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    
-    tsne = TSNE(n_components=2, perplexity=30, learning_rate=200,
-                max_iter=1000, random_state=76)
-    X_embedded = tsne.fit_transform(X_scaled)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        tsne = TSNE(n_components=2, perplexity=30, learning_rate=200,
+                    max_iter=1000, random_state=76)
+        X_embedded = tsne.fit_transform(X_scaled)
 
-    tsne_df = pd.DataFrame(X_embedded, columns=['t-SNE1', 't-SNE2'])
-    tsne_df['target'] = y.values 
+        tsne_df = pd.DataFrame(X_embedded, columns=['t-SNE1', 't-SNE2'])
+        tsne_df['target'] = y.values 
 
-    return tsne_df
+        return tsne_df

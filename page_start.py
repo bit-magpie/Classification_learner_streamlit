@@ -1,14 +1,14 @@
 import streamlit as st
 import pandas as pd
-from data_functions import DataFile
+from data_functions import DataFile, sk_datasets
 import data_functions
 
-@st.cache_resource
-def set_data(uploaded_file):
-    data_functions.data_file = DataFile(upload_file=uploaded_file)
+# @st.cache_resource
+# def set_data(uploaded_file):
+#     data_file = DataFile(upload_file=uploaded_file)
     
-def set_features():
-    data_functions.data_file.set_features()
+# def set_features():
+#     data_file.set_features()
 
 def get_dataset_df(dataset_loader):
     dataset = dataset_loader()
@@ -16,52 +16,105 @@ def get_dataset_df(dataset_loader):
     y = pd.Series(dataset['target'], name='target')
     target_names = {index: name for index, name in enumerate(dataset['target_names'])}
     y = y.map(target_names)
-    df = pd.concat([X, y], axis=1)
+    df = pd.concat([y, X], axis=1)
     return df, dataset['feature_names']
 
-def select_data():    
-    if data_functions.data_file is not None:
-        headers =  data_functions.data_file.df.columns
-        
-        target = st.selectbox("Target (y)", headers)
-        data_functions.data_file.target = target
-        st.text("Features (X)")
-                
-        for i, feature in enumerate(headers):
-            if feature != target:
-                data_functions.data_file.selection.append(st.checkbox(feature, value=True, key="feat"+str(i)))
+def load_file_data(uploaded_file):
+    df = pd.read_csv(uploaded_file)
+    dataset = DataFile(df=df, name=uploaded_file.name )
+    st.session_state["Dataset"] = dataset
 
-        # st.write(data_functions.data_file.selection)
+def load_sk_dataset(df, key, feature_cols):
+    dataset = DataFile(df=df, name=key)
+    dataset.features = feature_cols
+    dataset.target = "target" 
+    st.session_state["Dataset"] = dataset
+
+def show_exaplaination():
+    st.write("##### Dataset structure")
+    st.write("- Only CSV format is supported by this app.")
+    st.write("- Make sure the CSV file includes a header row, as shown in the example.")
+    st.write("- Including class names is recommended to make the visualizations more understandable.")
+    st.write("- Ensure the file size is less than 200MB.")
+    st.image("class_learn_exp.png")
+
+def feature_selection():
+    st.write("##### Select features(X) and target(y)")
+    if "Dataset" in st.session_state:
+        dataset = st.session_state["Dataset"]
+        headers =  dataset.df.columns
         
-        if st.button("Next"):
-            st.switch_page("page_visualizer.py")           
+        target = st.selectbox("Target (y)", headers, key="target")
+        st.session_state["Dataset"].target = target
+        
+        st.text("Features (X)")
+        with st.container(height=300):
+            col1, col2 = st.columns(2)
+            for i, feature in enumerate(headers):
+                if feature != target:
+                    if i%2 == 0:
+                        with col1:
+                            st.session_state["Dataset"].selection.append(st.checkbox(feature, value=True, key="feat"+str(i)))
+                    else:
+                        with col2:
+                            st.session_state["Dataset"].selection.append(st.checkbox(feature, value=True, key="feat"+str(i)))
+                    
+# def select_data():    
+#     if data_file is not None:
+#         headers =  data_file.df.columns
+        
+#         target = st.selectbox("Target (y)", headers)
+#         data_file.target = target
+#         st.text("Features (X)")
+                
+#         for i, feature in enumerate(headers):
+#             if feature != target:
+#                 data_file.selection.append(st.checkbox(feature, value=True, key="feat"+str(i)))
+        
+#         if st.button("Next"):
+#             st.switch_page("page_visualizer.py")           
         
 def main():    
-    _, col1, _ = st.columns([2,8,2])    
+    col1, _, col2 = st.columns([5, 1, 6])    
     with col1:
         st.header("Welcome to Classic Learner")
-        with st.container():
-            st.markdown("#### Start by uploading your dataset.")
-            
-            uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])
-            if uploaded_file is not None:
-                set_data.clear()
-                set_data(uploaded_file)
-                select_data()  
-
-            # st.markdown("#### Or try loading sample dataset.")
-            with st.expander("#### Or try loading sample dataset."):
-                df = None
-                btn_cols = st.columns(len(data_functions.sk_datasets))
-                for i, (k, v) in enumerate(data_functions.sk_datasets.items()):
-                    with btn_cols[i]:
-                        if st.button(k + " dataset"):
-                            df, feature_cols = get_dataset_df(v)
-                            data_functions.data_file = DataFile(df=df, name=k)
-                            data_functions.data_file.features = feature_cols
-                            data_functions.data_file.target = "target"                        
-                        
-                if df is not None:
-                    st.dataframe(df)  
+        # with st.container():
+        st.markdown("##### Upload your dataset.")
         
+        uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])
+        if uploaded_file is not None:
+            load_file_data(uploaded_file)
+            # set_data.clear()
+            # set_data(uploaded_file)
+            # select_data()  
+
+        st.markdown("##### Or use sample dataset.")
+        
+        with st.container(border=False, height=250):
+            df = None
+            btn_cols = st.columns(len(sk_datasets))
+            for i, (key, value) in enumerate(sk_datasets.items()):
+                with btn_cols[i]:
+                    if st.button(key + " dataset"):
+                        df, feature_cols = get_dataset_df(value)                       
+                        load_sk_dataset(df, key, feature_cols)
+                    
+        if "Dataset" in st.session_state:
+            btnNext = st.button("Proceed to Next Stage", key="btnGoViz", use_container_width=True, type="primary")
+            if btnNext:
+                st.session_state["Dataset"].set_features()
+                st.session_state["Dataset_loaded"] = True
+                st.switch_page("page_visualizer.py")
+                        
+    with col2:
+        st.header("")
+        if "Dataset" in st.session_state:       
+            tab1, tab2 = st.tabs(["Feature selection", "Data table"])
+            with tab1:
+                feature_selection()
+            with tab2:
+                st.dataframe(st.session_state["Dataset"].df)
+        else:
+            show_exaplaination()
+            
 main()

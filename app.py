@@ -9,6 +9,10 @@ st.set_page_config(
     page_title="Classic Learner",
     layout="wide"
     )
+
+if "Dataset_loaded" not in st.session_state:
+    st.session_state["Dataset_loaded"] = False
+
 def main():  
     start_page = st.Page("page_start.py", title="Data selection")
     visualizer = st.Page("page_visualizer.py", title="Visualize data")

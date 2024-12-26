@@ -40,12 +40,13 @@ def show_pbars(names, values):
 def get_cdistribution_train():
     dataset = st.session_state["Dataset"]
     split = st.session_state["sldSplit"]
-    train, _ = dataset.get_process_data(train_split=split)
+    dataset.get_process_data(train_split=split)
+    _, train = dataset.train_data
     
     classes = dataset.c_names
     vals = []
-    for _,v in groupby(sorted(train[1])):
-        vals.append(len([*v]) / len(train[1]))
+    for _,v in groupby(sorted(train)):
+        vals.append(len([*v]) / len(train))
         
     show_pbars(classes, vals)
     
@@ -71,26 +72,28 @@ def tablulate_models():
     for k,v in model_list.items():
         model_element(k, v["long_name"], v["parameters"])
         
-def train_model():
-    train, test = data_functions.data_file.get_process_data()
-    
+def train_model():    
     model_list = learner_module.classification_algorithms
+    trained_models = dict()
+    
     for k in model_list.keys():
         if st.session_state[k]:
             with acc_placeholders[k].container(): 
                 with st.spinner("Training..."):
+                    dataset = st.session_state["Dataset"]
                     model = Learner(k, model_list[k]["function"], model_list[k]["parameters"])
-                    model.num_cls = len(data_functions.data_file.c_names)
-                    model.set_train_test(train, test)
-                    model.train_model()
-                    model.eval_model()                    
+                    model.num_cls = len(dataset.c_names)
+                    model.train_model(dataset.train_data)
+                    model.eval_model(dataset.test_data)                    
                     
                     # model = model_list[k]["function"]()
                     # model.fit(X,y) 
                     # accuracy = learner_module.get_metrics(model, X, y) 
             
                 st.write(f"#### {model.accuracy*100:.1f}%")
-                learner_module.trained_models[k] = model
+                trained_models[k] = model
+    
+    st.session_state["Trained_models"] = trained_models
 
 def main():
     st.header("Model training")

@@ -157,8 +157,8 @@ class Learner:
         self.name = name
         self.model = None
         self.params = params
-        self.train_data = None
-        self.test_data = None
+        # self.train_data = None
+        # self.test_data = None
         self.accuracy = None
         self.f1 = None
         self.c_matrix = None
@@ -167,25 +167,25 @@ class Learner:
         
         self._load_model(model)
     
-    def load_data(self, X, y, shuffle=True, train_split=0.8):
-        if shuffle:
-            X, y = self._shuffle_set(X, y)
+    # def load_data(self, X, y, shuffle=True, train_split=0.8):
+    #     if shuffle:
+    #         X, y = self._shuffle_set(X, y)
         
-        n_train = int(len(y) * train_split)
-        self.train_data = [X[:n_train], y[:n_train]]
-        self.test_data = [X[n_train:], y[n_train:]]
+    #     n_train = int(len(y) * train_split)
+    #     self.train_data = [X[:n_train], y[:n_train]]
+    #     self.test_data = [X[n_train:], y[n_train:]]
         
-    def set_train_test(self, train, test):
-        self.train_data = train
-        self.test_data = test
+    # def set_train_test(self, train, test):
+    #     self.train_data = train
+    #     self.test_data = test
     
-    def train_model(self):        
-        X, y = self.train_data
+    def train_model(self, train_data):        
+        X, y = train_data
         self.model.fit(X, y)
     
-    def eval_model(self):
+    def eval_model(self, test_data):
         if self.model is not None:
-            X, y = self.test_data
+            X, y = test_data
             y_preds = self.model.predict(X)
             
             self.accuracy = accuracy_score(y, y_preds)            
@@ -194,10 +194,10 @@ class Learner:
             fpr, tpr, _ = roc_curve(y, y_preds, pos_label=self.num_cls)
             self.auc = auc(fpr, tpr)
         
-    def _shuffle_set(self, X, y):
-        idx = np.arange(len(y))
-        np.random.shuffle(idx)        
-        return X[idx], y[idx]
+    # def _shuffle_set(self, X, y):
+    #     idx = np.arange(len(y))
+    #     np.random.shuffle(idx)        
+    #     return X[idx], y[idx]
         
     def _load_model(self, model):
         self.model = model(**self.params)

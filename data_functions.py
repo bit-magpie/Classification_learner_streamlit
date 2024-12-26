@@ -25,6 +25,8 @@ class DataFile:
         self.selection = []
         self.target = None
         self.c_names = None
+        self.train_data = None
+        self.test_data = None
         if upload_file is not None:
             self._get_info(upload_file)
             
@@ -61,7 +63,9 @@ class DataFile:
         train_data = [X[:n_train], y[:n_train]]
         test_data = [X[n_train:], y[n_train:]]
         
-        return train_data, test_data
+        self.train_data = train_data
+        self.test_data = test_data
+        # return train_data, test_data
         
     def _shuffle_set(self, X, y):
         idx = np.arange(len(y))

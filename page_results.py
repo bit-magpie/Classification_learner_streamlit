@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import pickle
 from learner_module import classification_algorithms
 import data_functions
 
@@ -61,7 +62,31 @@ def show_results_table(df):
     #     model_id = df.iloc[selected_row]['id']
     #     model_name = df.iloc[selected_row]['Model']
         # show_details(model_id, model_name)
-                
+
+def download_models(model_id):
+    code = f'''
+    import pickle
+    
+    # load model
+    with open('{model_id}_model.pkl', 'rb') as file:
+        model = pickle.load(file)
+    
+    # pass feature set
+    model.predict(X)
+    '''
+    st.info("Downalod pickel file and use following code for predictions")
+    st.code(code, language="python")
+    
+    _, col = st.columns([9,3], gap="large")
+    with col:
+        st.download_button(
+            "Download",
+            data=pickle.dumps(st.session_state["Trained_models"][model_id].model),
+            file_name=f"{model_id}_model.pkl",
+            type='primary'
+        )
+    
+   
 def plot_bar(df, plot):
     fig = px.bar(df, x="id", y=plot)
     event = st.plotly_chart(fig, key="plot_bar_" + plot , on_select="rerun")
@@ -71,7 +96,7 @@ def main():
     
     # if len(learner_module.trained_models) > 0:
     if "Trained_models" in st.session_state:
-        col1, col2 = st.columns([6,6])
+        col1, col2 = st.columns([6,6], gap="medium")
         
         with col1:
             tab1, tab2, tab3, tab4 = st.tabs(["All results", "Accuary", "F1-Score", "AUC"])
@@ -86,14 +111,17 @@ def main():
                 plot_bar(df, "AUC")
         
         with col2:
-            ptab1, ptab2 = st.tabs(["Confusion Matrix", "Border Visualization"])
+            ptab1, ptab2 = st.tabs(["Confusion Matrix", "Download models"])
             with ptab1:
-                model_name = st.selectbox("Select model", df["Model"].to_list())
+                model_name = st.selectbox("Select model", df["Model"].to_list(), key="plot_mdl_select")
                 model_id = df.loc[df['Model'] == model_name]["id"].values[0]
                 # print(model_id)
                 show_confusion_matrix(model_id, model_name)
             with ptab2:
-                pass
+                st.write("##### Download trained model")
+                dwon_model_name = st.selectbox("Select model", df["Model"].to_list(),  key="down_mdl_select")
+                model_id = df.loc[df['Model'] == dwon_model_name]["id"].values[0]
+                download_models(model_id)
 
     else:
         st.text("No trained models found. Please trained the models first.")

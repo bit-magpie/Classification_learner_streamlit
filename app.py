@@ -18,7 +18,8 @@ def main():
     visualizer = st.Page("page_visualizer.py", title="Visualize data")
     models = st.Page("page_models.py", title="Model training")
     results = st.Page("page_results.py", title="Evaluvation summary")
-    page_nav = st.navigation([start_page, visualizer, models, results])
+    about = st.Page("page_about.py", title="About")
+    page_nav = st.navigation([start_page, visualizer, models, results, about])
     page_nav.run()                  
     
     # if st.session_state["Dataset_loaded"]:

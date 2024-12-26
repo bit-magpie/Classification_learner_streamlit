@@ -20,5 +20,13 @@ def main():
     results = st.Page("page_results.py", title="Evaluvation summary")
     page_nav = st.navigation([start_page, visualizer, models, results])
     page_nav.run()                  
+    
+    # if st.session_state["Dataset_loaded"]:
+    #     with st.sidebar:
+    #         with st.container(border=True):
+    #             st.write("Dataset: ``")
+    #             st.write("No. Features: ``")
+    #             st.write("No. Classes: ``")
+            
 
 main()

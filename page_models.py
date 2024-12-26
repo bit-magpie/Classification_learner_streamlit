@@ -1,6 +1,6 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+import plotly.express as px
+from itertools import groupby
 import data_functions
 import learner_module
 from learner_module import Learner
@@ -32,6 +32,39 @@ def model_element(id, name, params):
     
     return chkbox
 
+def show_pbars(names, values):
+    for name, val in zip(names, values):
+        text = f"{name} - `{val * 100:.1f}%`"
+        st.progress(val, text=text)
+
+def get_cdistribution_train():
+    dataset = st.session_state["Dataset"]
+    split = st.session_state["sldSplit"]
+    train, _ = dataset.get_process_data(train_split=split)
+    
+    classes = dataset.c_names
+    vals = []
+    for _,v in groupby(sorted(train[1])):
+        vals.append(len([*v]) / len(train[1]))
+        
+    show_pbars(classes, vals)
+    
+def get_cdistribution_all():
+    dataset = st.session_state["Dataset"]
+    _, all_data = dataset.get_train_data()
+    
+    classes = dataset.c_names    
+    vals = []
+    
+    for _,v in groupby(sorted(all_data)):
+        vals.append(len([*v]) / len(all_data))
+    
+    show_pbars(classes, vals)
+    
+    # fig = px.bar(x=x, y=y, height=300)
+    # event = st.plotly_chart(fig, key="cdist" , on_select="rerun")
+    
+
 def tablulate_models():    
     model_list = learner_module.classification_algorithms
     
@@ -60,23 +93,40 @@ def train_model():
                 learner_module.trained_models[k] = model
 
 def main():
-    _, col, _ = st.columns([2,8,2])
-    with col:    
-        st.header("Model training")    
-        if data_functions.data_file is not None:
-            with st.container(border=True): 
-                col1, col2 = st.columns([10,2])
-                with col1:
-                    st.write("Selects models to train")
-                with col2:
+    st.header("Model training")
+    if "Dataset" in st.session_state:
+        col1, _, col2 = st.columns([6,1,5])
+        with col1:                 
+            with st.container(border=False): 
+                trnCol1, trnCol2 = st.columns([10,2])
+                with trnCol1:
+                    st.write("Select models to train")
+                with trnCol2:
                     btnTrain = st.button("Train all", key="btnTrain", type="primary")
                 
-                tablulate_models()
+                with st.container(border=True, height=500):
+                    tablulate_models()
                 if btnTrain:
                     train_model()
-        else:
-            st.text("No dataset found. Please upload a CSV formatted data file.")
-            if st.button("Go to upload page"):
-                st.switch_page("page_start.py")
+        with col2:
+            st.write("##### Common configurations")
+            split = st.slider("Train-test split", 0.1, 0.9, 0.8, key="sldSplit")
+            st.radio("Model selection", ["All", "All linear", "All non-linear", "Custom"])
+            
+            st.write("##### Class distributions")
+            plotCol1, plotCol2 = st.columns(2, border=True)
+            with plotCol1:
+                st.write("All data")
+                with st.container(border=False, height=170):
+                    get_cdistribution_all()
+            with plotCol2:
+                st.write("Train split") 
+                with st.container(border=False, height=170):
+                    get_cdistribution_train()               
+
+    else:
+        st.text("No dataset found. Please upload a CSV formatted data file.")
+        if st.button("Go to upload page"):
+            st.switch_page("page_start.py")
 
 main()

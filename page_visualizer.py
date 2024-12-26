@@ -58,9 +58,7 @@ def visualize_distplot():
     event = st.plotly_chart(fig, key="plot_dist", on_select="rerun")
 
 def visualize_pairplot():
-    # with st.expander("Pairplot"):
-    # plot = sns.pairplot(dataset.df, hue=dataset.target)
-    # st.pyplot(plot.figure)
+    st.info("If the dataset contains more than 5 features, a t-SNE plot will be displayed; otherwise, a pairplot will be shown.", icon="ℹ️")
     if len(dataset.features) > 5:
         tsne_df = get_tsne()
         fig = px.scatter(tsne_df, x="t-SNE1", y="t-SNE2",

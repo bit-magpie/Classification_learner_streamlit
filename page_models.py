@@ -98,7 +98,7 @@ def train_model():
 def main():
     st.header("Model training")
     if "Dataset" in st.session_state:
-        col1, _, col2 = st.columns([6,1,5])
+        col1, col2 = st.columns([6, 6], gap='large')
         with col1:                 
             with st.container(border=False): 
                 trnCol1, trnCol2 = st.columns([10,2])
@@ -107,7 +107,7 @@ def main():
                 with trnCol2:
                     btnTrain = st.button("Train all", key="btnTrain", type="primary")
                 
-                with st.container(border=True, height=500):
+                with st.container(border=True, height=540):
                     tablulate_models()
                 if btnTrain:
                     train_model()

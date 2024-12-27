@@ -119,16 +119,16 @@ classification_algorithms = {
             "learning_rate": "constant"
         }
     },
-    "KMC": {
-        "long_name": "K-Means",
-        "function": sklearn.cluster.KMeans,
-        "parameters": {
-            "n_clusters": 8,
-            "init": "k-means++",
-            "n_init": 10,
-            "max_iter": 300
-        }
-    },
+    # "KMC": {
+    #     "long_name": "K-Means",
+    #     "function": sklearn.cluster.KMeans,
+    #     "parameters": {
+    #         "n_clusters": 8,
+    #         "init": "k-means++",
+    #         "n_init": 10,
+    #         "max_iter": 300
+    #     }
+    # },
     "GMM": {
         "long_name": "Gaussian Mixture Model",
         "function": sklearn.mixture.GaussianMixture,

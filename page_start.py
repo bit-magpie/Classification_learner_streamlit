@@ -79,6 +79,16 @@ def feature_selection():
         
 #         if st.button("Next"):
 #             st.switch_page("page_visualizer.py")           
+
+def dataset_desc(key, value):
+    with st.container():
+        _, col1, col2 = st.columns([2, 6, 4], vertical_alignment='center')
+        with col1:
+            st.write(f"**{key} Dataset**")
+        with col2:
+            if st.button("Load", key="btn" + key):
+                df, feature_cols = get_dataset_df(value)
+                load_sk_dataset(df, key, feature_cols)
         
 def main():    
     col1, _, col2 = st.columns([5, 1, 6])    
@@ -100,10 +110,11 @@ def main():
             df = None
             btn_cols = st.columns(len(sk_datasets))
             for i, (key, value) in enumerate(sk_datasets.items()):
-                with btn_cols[i]:
-                    if st.button(key + " dataset"):
-                        df, feature_cols = get_dataset_df(value)                       
-                        load_sk_dataset(df, key, feature_cols)
+                dataset_desc(key, value)
+                # with btn_cols[i]:
+                #     if st.button(key + " dataset"):
+                #         df, feature_cols = get_dataset_df(value)                       
+                #         load_sk_dataset(df, key, feature_cols)
                     
         if "Dataset" in st.session_state:
             btnNext = st.button("Proceed to Next Stage", key="btnGoViz", use_container_width=True, type="primary")

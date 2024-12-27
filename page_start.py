@@ -45,7 +45,7 @@ def set_target():
     st.session_state["Dataset"].target = st.session_state["target"]
 
 def feature_selection():
-    st.write("##### Select features(X) and target(y)")
+    st.write("##### Select features and target")
     if "Dataset" in st.session_state:
         dataset = st.session_state["Dataset"]
         headers =  dataset.df.columns
@@ -81,17 +81,21 @@ def feature_selection():
 #             st.switch_page("page_visualizer.py")           
 
 def dataset_desc(key, value):
-    with st.container():
-        _, col1, col2 = st.columns([2, 6, 4], vertical_alignment='center')
+    with st.container(border=False):
+        _, col1, col2 = st.columns([1, 7, 4], vertical_alignment='center')
         with col1:
-            st.write(f"**{key} Dataset**")
+            data = value()
+            n_samples, n_features, n_classes = len(data["data"]), len(data["feature_names"]), len(data["target_names"])
+            st.markdown(f"**{key} Dataset**")
+            st.write(f"Instances: `{n_samples}` Features: `{n_features}` Classes: `{n_classes}`")
+            st.html("<hr>")
         with col2:
             if st.button("Load", key="btn" + key):
                 df, feature_cols = get_dataset_df(value)
                 load_sk_dataset(df, key, feature_cols)
         
 def main():    
-    col1, _, col2 = st.columns([5, 1, 6])    
+    col1, col2 = st.columns([7, 5], gap="large")    
     with col1:
         st.header("Welcome to Classic Learner")
         # with st.container():
@@ -105,11 +109,12 @@ def main():
             # select_data()  
 
         st.markdown("##### Or use sample dataset.")
-        
-        with st.container(border=False, height=250):
-            df = None
-            btn_cols = st.columns(len(sk_datasets))
-            for i, (key, value) in enumerate(sk_datasets.items()):
+
+        with st.container(border=False, height=350):
+            # df = None
+            # btn_cols = st.columns(len(sk_datasets))
+            
+            for i, (key, value) in enumerate(sk_datasets.items()):                
                 dataset_desc(key, value)
                 # with btn_cols[i]:
                 #     if st.button(key + " dataset"):
@@ -117,7 +122,7 @@ def main():
                 #         load_sk_dataset(df, key, feature_cols)
                     
         if "Dataset" in st.session_state:
-            btnNext = st.button("Proceed to Next Stage", key="btnGoViz", use_container_width=True, type="primary")
+            btnNext = st.button("Load Dataset and Proceed", key="btnGoViz", use_container_width=True, type="primary")
             if btnNext:
                 st.session_state["Dataset"].set_features()
                 st.session_state["Dataset_loaded"] = True

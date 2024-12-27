@@ -97,7 +97,7 @@ def train_model():
 
 def main():
     st.header("Model training")
-    if "Dataset" in st.session_state:
+    if st.session_state["Dataset_loaded"]:
         col1, col2 = st.columns([7, 5], gap='large')
         with col1:                 
             with st.container(border=False): 

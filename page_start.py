@@ -91,6 +91,7 @@ def dataset_desc(key, value):
             st.html("<hr>")
         with col2:
             if st.button("Load", key="btn" + key):
+                st.session_state["Dataset_loaded"] = False
                 df, feature_cols = get_dataset_df(value)
                 load_sk_dataset(df, key, feature_cols)
         

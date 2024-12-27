@@ -27,12 +27,14 @@ class DataFile:
         self.c_names = None
         self.train_data = None
         self.test_data = None
+        self._df = None
         if upload_file is not None:
             self._get_info(upload_file)
             
         if df is not None:
             self.name = name
             self.df = df
+            self._df = df.copy()
             
     
     def _get_info(self, upload_file):
@@ -48,10 +50,10 @@ class DataFile:
             
     def get_train_data(self):
         if self.target is not None and self.features is not None:
-            self.df[['classes']] = self.df[[self.target]].apply(lambda col:pd.Categorical(col).codes)
-            self.c_names = list(self.df[self.target].unique())
-            X = self.df[self.features].to_numpy()
-            y = self.df[['classes']].to_numpy().ravel()
+            self._df[['classes']] = self._df[[self.target]].apply(lambda col:pd.Categorical(col).codes)
+            self.c_names = list(self._df[self.target].unique())
+            X = self._df[self.features].to_numpy()
+            y = self._df[['classes']].to_numpy().ravel()
             return X, y
         
     def get_process_data(self, shuffle=True, train_split=0.8):

@@ -123,10 +123,12 @@ def main():
                     
         if "Dataset" in st.session_state:
             btnNext = st.button("Load Dataset and Proceed", key="btnGoViz", use_container_width=True, type="primary")
-            if btnNext:
+            if btnNext:                
                 st.session_state["Dataset"].set_features()
                 st.session_state["Dataset_loaded"] = True
-                st.write(st.session_state["Dataset"].target)
+                dataset = st.session_state["Dataset"]
+                st.session_state["n_samples"] = len(dataset.df)
+                st.write(dataset.target)
                 st.switch_page("page_visualizer.py")
                         
     with col2:
@@ -136,7 +138,7 @@ def main():
             with tab1:
                 feature_selection()
             with tab2:
-                st.dataframe(st.session_state["Dataset"].df)
+                st.dataframe(st.session_state["Dataset"].df, height=550)
         else:
             show_exaplaination()
             

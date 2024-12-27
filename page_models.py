@@ -52,7 +52,7 @@ def get_cdistribution_train():
     
 def get_cdistribution_all():
     dataset = st.session_state["Dataset"]
-    _, all_data = dataset.get_train_data()
+    _, all_data = dataset.get_train_data()    
     
     classes = dataset.c_names    
     vals = []
@@ -114,7 +114,19 @@ def main():
         with col2:
             st.write("##### Common configurations")
             split = st.slider("Train-test split", 0.1, 0.9, 0.8, key="sldSplit")
-            st.radio("Model selection", ["All", "All linear", "All non-linear", "Custom"])
+            
+            setCol1, setCol2, setCol3 = st.columns([6, 3, 3], vertical_alignment='center') 
+            with setCol1:
+                st.radio("Model selection", ["All", "All linear", "All non-linear", "Custom"])
+                
+            if "n_samples" in st.session_state:
+                with setCol2:
+                    train_percent = st.session_state["sldSplit"]
+                    n_samples = st.session_state["n_samples"]
+                    n_train = int(n_samples * train_percent)
+                    st.metric(label="Training", value=f"{n_train}", delta= f"{train_percent*100:.1f} %")
+                with setCol3:
+                    st.metric(label="Testing", value=f"{n_samples - n_train}", delta= f"{(1 - train_percent)*100:.1f} %")
             
             st.write("##### Class distributions")
             plotCol1, plotCol2 = st.columns(2, border=True)

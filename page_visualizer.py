@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 import plotly.express as px
 import plotly.figure_factory as ff
 
@@ -54,7 +55,7 @@ def visualize_distplot():
         values.append(value[feat].tolist())
         classes.append(name[0])
         
-    fig = ff.create_distplot(values, classes, bin_size=.2)
+    fig = ff.create_distplot(values, classes, bin_size=.2, curve_type='normal', show_hist=False)
     event = st.plotly_chart(fig, key="plot_dist", on_select="rerun")
 
 def visualize_pairplot():

@@ -140,7 +140,7 @@ def main():
                     get_cdistribution_train()               
 
     else:
-        st.text("No dataset found. Please upload a CSV formatted data file.")
+        st.warning('No dataset found. Please upload a CSV formatted data file or load existing dataset and click the "Load Dataset and Proceed" button.')
         if st.button("Go to upload page"):
             st.switch_page("page_start.py")
 

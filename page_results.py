@@ -124,7 +124,7 @@ def main():
                 download_models(model_id)
 
     else:
-        st.text("No trained models found. Please trained the models first.")
+        st.warning("No trained models found. Please trained the models first.")
         if st.button("Go to training page"):
             st.switch_page("page_models.py")
 

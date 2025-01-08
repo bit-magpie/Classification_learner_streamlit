@@ -87,9 +87,18 @@ def download_models(model_id):
         )
     
    
-def plot_bar(df, plot):
-    fig = px.bar(df, x="id", y=plot)
-    event = st.plotly_chart(fig, key="plot_bar_" + plot , on_select="rerun")
+def plot_bar(df): #, plot):
+    # fig = px.bar(df, x="id", y=plot)
+    df = df[["id", "Accuracy", "F1 Score", "AUC"]]
+    df_melted = df.melt(id_vars="id", var_name="Metric", value_name="Score")
+    fig = px.bar(df_melted, 
+                 x="id", 
+                 y="Score", 
+                 color="Metric", 
+                 barmode='group', 
+                 labels={"Score": "Performance Metric Values", "id": "Machine Learning Method"}
+                 )
+    event = st.plotly_chart(fig, key="plot_bar", on_select="rerun")
 
 def main():    
     st.header("Evaluation summary")   
@@ -99,16 +108,17 @@ def main():
         col1, col2 = st.columns([6,6], gap="medium")
         
         with col1:
-            tab1, tab2, tab3, tab4 = st.tabs(["All results", "Accuary", "F1-Score", "AUC"])
+            # tab1, tab2, tab3, tab4 = st.tabs(["All results", "Accuary", "F1-Score", "AUC"])
+            tab1, tab2 = st.tabs(["All results", "Plots"])
             df = get_eval_metrics()
             with tab1:          
                 show_results_table(df)                    
             with tab2:
-                plot_bar(df, "Accuracy")
-            with tab3:
-                plot_bar(df, "F1 Score")
-            with tab4:
-                plot_bar(df, "AUC")
+                plot_bar(df)
+            # with tab3:
+            #     plot_bar(df, "F1 Score")
+            # with tab4:
+            #     plot_bar(df, "AUC")
         
         with col2:
             ptab1, ptab2 = st.tabs(["Confusion Matrix", "Download models"])

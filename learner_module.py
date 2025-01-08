@@ -1,7 +1,7 @@
 import numpy as np
 import sklearn
 from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, auc, roc_curve
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, auc, roc_curve, roc_auc_score
 
 trained_models = dict()
 
@@ -60,6 +60,7 @@ classification_algorithms = {
         "long_name": "Linear Support Vector Machine",
         "function": sklearn.svm.SVC,
         "parameters": {
+            "probability": True,
             "kernel": "linear",
             "C": 1.0,
             "max_iter": -1
@@ -69,6 +70,7 @@ classification_algorithms = {
         "long_name": "Quadratic Support Vector Machine",
         "function": sklearn.svm.SVC,
         "parameters": {
+            "probability": True,
             "kernel": "poly",
             "degree": 2,
             "C": 1.0,
@@ -79,6 +81,7 @@ classification_algorithms = {
         "long_name": "Cubic Support Vector Machine",
         "function": sklearn.svm.SVC,
         "parameters": {
+            "probability": True,
             "kernel": "poly",
             "degree": 3,
             "C": 1.0,
@@ -89,6 +92,7 @@ classification_algorithms = {
         "long_name": "Radial Basis Function Support Vector Machine",
         "function": sklearn.svm.SVC,
         "parameters": {
+            "probability": True,
             "kernel": "rbf",
             "C": 1.0,
             "gamma": "scale"
@@ -119,21 +123,12 @@ classification_algorithms = {
             "learning_rate": "constant"
         }
     },
-    # "KMC": {
-    #     "long_name": "K-Means",
-    #     "function": sklearn.cluster.KMeans,
-    #     "parameters": {
-    #         "n_clusters": 8,
-    #         "init": "k-means++",
-    #         "n_init": 10,
-    #         "max_iter": 300
-    #     }
-    # },
+
     "GMM": {
         "long_name": "Gaussian Mixture Model",
         "function": sklearn.mixture.GaussianMixture,
         "parameters": {
-            "n_components": 1,
+            "n_components": 3,
             "covariance_type": "full",
             "init_params": "kmeans",
             "max_iter": 100
@@ -188,11 +183,19 @@ class Learner:
             X, y = test_data
             y_preds = self.model.predict(X)
             
+            if hasattr(self.model, "predict_proba"):
+                pred_score = self.model.predict_proba(X)
+            else:
+                pred_score = self.model.decision_function(X)
+            
             self.accuracy = accuracy_score(y, y_preds)            
             self.f1 = f1_score(y, y_preds, average='weighted')
-            self.c_matrix = confusion_matrix(y, y_preds)            
-            fpr, tpr, _ = roc_curve(y, y_preds, pos_label=self.num_cls)
-            self.auc = auc(fpr, tpr)
+            self.c_matrix = confusion_matrix(y, y_preds)
+            # print(y)      
+            # print(pred_score)      
+            # fpr, tpr, _ = roc_curve(y, pred_score, multi_class='ovr')
+            # self.auc = auc(fpr, tpr)
+            self.auc = roc_auc_score(y, pred_score, multi_class='ovr')
         
     # def _shuffle_set(self, X, y):
     #     idx = np.arange(len(y))

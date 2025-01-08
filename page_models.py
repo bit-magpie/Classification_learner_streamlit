@@ -70,6 +70,8 @@ def tablulate_models():
     model_list = learner_module.classification_algorithms
     
     for k,v in model_list.items():
+        if "n_components" in v["parameters"].keys():
+            model_list[k]["parameters"]["n_components"] = len(st.session_state["Dataset"].c_names)
         model_element(k, v["long_name"], v["parameters"])
         
 def train_model():    
@@ -80,7 +82,7 @@ def train_model():
         if st.session_state[k]:
             with acc_placeholders[k].container(): 
                 with st.spinner("Training..."):
-                    dataset = st.session_state["Dataset"]
+                    dataset = st.session_state["Dataset"]                    
                     model = Learner(k, model_list[k]["function"], model_list[k]["parameters"])
                     model.num_cls = len(dataset.c_names)
                     model.train_model(dataset.train_data)

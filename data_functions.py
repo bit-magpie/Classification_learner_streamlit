@@ -58,6 +58,7 @@ class DataFile:
         
     def get_process_data(self, shuffle=True, train_split=0.8):
         X, y = self.get_train_data()
+        
         if shuffle:
             X, y = self._shuffle_set(X, y)
         
@@ -67,7 +68,6 @@ class DataFile:
         
         self.train_data = train_data
         self.test_data = test_data
-        # return train_data, test_data
         
     def _shuffle_set(self, X, y):
         idx = np.arange(len(y))

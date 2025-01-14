@@ -191,10 +191,6 @@ class Learner:
             self.accuracy = accuracy_score(y, y_preds)            
             self.f1 = f1_score(y, y_preds, average='weighted')
             self.c_matrix = confusion_matrix(y, y_preds)
-            # print(y)      
-            # print(pred_score)      
-            # fpr, tpr, _ = roc_curve(y, pred_score, multi_class='ovr')
-            # self.auc = auc(fpr, tpr)
             self.auc = roc_auc_score(y, pred_score, multi_class='ovr')
         
     # def _shuffle_set(self, X, y):

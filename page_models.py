@@ -10,6 +10,7 @@ acc_placeholders = dict()
 
 def list_params(params):
     param_string = ""
+    
     for k, v in params.items():
         param_string += f"{k}:`{v}` "
     st.write(param_string)        
@@ -17,22 +18,20 @@ def list_params(params):
 def model_element(id, name, params):
     with st.container(border=True):
         col1, col2, col3 = st.columns([1, 9, 2])
+        
         with col1:
             chkbox = st.checkbox("|", key=id, value=True)
         with col2:            
             st.write("##### " + name)
             list_params(params)
-            # param_string = ["`{}`".format(p) for p in params]
-            # st.write(" ".join(param_string))
         with col3:
             st.write(" ")
             acc_placeholders[id] = st.empty()
-            # st.write("##### 100%")
-            # st.button("Reults", key="btn"+id)
     
     return chkbox
 
 def show_pbars(names, values):
+    
     for name, val in zip(names, values):
         text = f"{name} - `{val * 100:.1f}%`"
         st.progress(val, text=text)
@@ -45,6 +44,7 @@ def get_cdistribution_train():
     
     classes = dataset.c_names
     vals = []
+    
     for _,v in groupby(sorted(train)):
         vals.append(len([*v]) / len(train))
         
@@ -60,11 +60,7 @@ def get_cdistribution_all():
     for _,v in groupby(sorted(all_data)):
         vals.append(len([*v]) / len(all_data))
     
-    show_pbars(classes, vals)
-    
-    # fig = px.bar(x=x, y=y, height=300)
-    # event = st.plotly_chart(fig, key="cdist" , on_select="rerun")
-    
+    show_pbars(classes, vals)    
 
 def tablulate_models():    
     model_list = learner_module.classification_algorithms
@@ -87,11 +83,7 @@ def train_model():
                     model.num_cls = len(dataset.c_names)
                     model.train_model(dataset.train_data)
                     model.eval_model(dataset.test_data)                    
-                    
-                    # model = model_list[k]["function"]()
-                    # model.fit(X,y) 
-                    # accuracy = learner_module.get_metrics(model, X, y) 
-            
+                                
                 st.write(f"#### {model.accuracy*100:.1f}%")
                 trained_models[k] = model
     
@@ -99,6 +91,7 @@ def train_model():
 
 def main():
     st.header("Model training")
+    
     if st.session_state["Dataset_loaded"]:
         col1, col2 = st.columns([7, 5], gap='large')
         with col1:                 
@@ -113,6 +106,7 @@ def main():
                     tablulate_models()
                 if btnTrain:
                     train_model()
+        
         with col2:
             st.write("##### Common configurations")
             split = st.slider("Train-test split", 0.1, 0.9, 0.8, key="sldSplit")
@@ -127,22 +121,28 @@ def main():
                     n_samples = st.session_state["n_samples"]
                     n_train = int(n_samples * train_percent)
                     st.metric(label="Training", value=f"{n_train}", delta= f"{train_percent*100:.1f} %")
+                
                 with setCol3:
                     st.metric(label="Testing", value=f"{n_samples - n_train}", delta= f"{(1 - train_percent)*100:.1f} %")
             
             st.write("##### Class distributions")
             plotCol1, plotCol2 = st.columns(2, border=True)
+            
             with plotCol1:
                 st.write("All data")
+                
                 with st.container(border=False, height=170):
                     get_cdistribution_all()
+            
             with plotCol2:
                 st.write("Train split") 
+                
                 with st.container(border=False, height=170):
                     get_cdistribution_train()               
 
     else:
         st.warning('No dataset found. Please upload a CSV formatted data file or load existing dataset and click the "Load Dataset and Proceed" button.')
+        
         if st.button("Go to upload page"):
             st.switch_page("page_start.py")
 

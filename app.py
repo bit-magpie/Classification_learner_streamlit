@@ -1,8 +1,4 @@
 import streamlit as st
-import pandas as pd
-import seaborn as sns
-import plotly.express as px
-import time
 
 st.set_page_config(
     page_icon="🎓", 

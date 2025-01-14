@@ -10,7 +10,6 @@ if "Dataset" in st.session_state:
     dataset = st.session_state["Dataset"]
 
 def show_meta_data():
-    # with st.expander("Meta data", expanded=True):
     with st.container(border=True):
         dataset.set_features()
         feature_string = ["`{}`".format(feat) for feat in dataset.features]
@@ -20,8 +19,6 @@ def show_meta_data():
         st.write("**Feature columns:** " + " ".join(feature_string))        
 
 def visualize_scatter():    
-    # with st.expander("Scatter plot"):
-    # st.markdown("### Scatter plot")
     feat_list = dataset.features
     col1, col2 = st.columns(2)
     with col1:
@@ -38,8 +35,7 @@ def visualize_scatter():
 
     event = st.plotly_chart(fig, key="plot_scatter", on_select="rerun")
 
-def visualize_boxplots():
-    # with st.expander("Boxplots"):        
+def visualize_boxplots():     
     feat = st.selectbox("Select feature", dataset.features, key="ft_bplot")
     fig = px.box(dataset.df, 
                     x=dataset.target, 
@@ -77,7 +73,6 @@ def visualize_pairplot():
 def main():    
     st.header("Visualize data")   
     if st.session_state["Dataset_loaded"]:
-    # if dataset is not None: 
         col1, _, col2 = st.columns([8, 1, 3])     
 
         with col1:

@@ -1,14 +1,6 @@
 import streamlit as st
 import pandas as pd
 from data_functions import DataFile, sk_datasets
-import data_functions
-
-# @st.cache_resource
-# def set_data(uploaded_file):
-#     data_file = DataFile(upload_file=uploaded_file)
-    
-# def set_features():
-#     data_file.set_features()
 
 def get_dataset_df(dataset_loader):
     dataset = dataset_loader()

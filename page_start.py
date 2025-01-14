@@ -9,6 +9,7 @@ def get_dataset_df(dataset_loader):
     target_names = {index: name for index, name in enumerate(dataset['target_names'])}
     y = y.map(target_names)
     df = pd.concat([y, X], axis=1)
+    
     return df, dataset['feature_names']
 
 def load_file_data(uploaded_file):

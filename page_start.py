@@ -98,7 +98,7 @@ def main():
         uploaded_file = st.file_uploader(label="Upload a CSV file", key="dataset_uploder", type=["csv"])
         if uploaded_file is not None:
             st.session_state["Dataset_loaded"] = False
-            del st.session_state["Dataset"]
+            # del st.session_state["Dataset"]
             load_file_data(uploaded_file)
             # set_data.clear()
             # set_data(uploaded_file)
